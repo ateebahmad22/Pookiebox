@@ -1,0 +1,6 @@
+{
+  "name": "PookieBox - A Little Box, A Lot of Love",
+  "description": "Premium coquette-aesthetic gifting e-commerce platform with interactive 3D gift box builder, birthday scheduler, and seamless checkout.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
