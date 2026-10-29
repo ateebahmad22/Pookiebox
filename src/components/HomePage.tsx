@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Hero3DBox } from './Hero3DBox.tsx';
-import { Product, CustomGiftBox } from '../types.ts';
+import { Product } from '../types.ts';
 import { CATEGORIES } from '../data/catalog.ts';
+import { BowIcon } from './BowIcon.tsx';
 import {
   Sparkles,
   Gift,
@@ -10,9 +11,14 @@ import {
   Heart,
   Star,
   ShoppingBag,
-  Check,
   ChevronRight,
-  HelpCircle,
+  Box,
+  ScrollText,
+  Gem,
+  Cookie,
+  Flower2,
+  Cake,
+  Mail,
 } from 'lucide-react';
 
 interface HomePageProps {
@@ -23,6 +29,8 @@ interface HomePageProps {
   onAddToCart: (product: Product) => void;
   wishlistIds: string[];
   onToggleWishlist: (productId: string) => void;
+  onOpenQuiz?: () => void;
+  onOpenSurpriseMe?: () => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
@@ -33,12 +41,37 @@ export const HomePage: React.FC<HomePageProps> = ({
   onAddToCart,
   wishlistIds,
   onToggleWishlist,
+  onOpenQuiz,
+  onOpenSurpriseMe,
 }) => {
   const [showQuizModal, setShowQuizModal] = useState(false);
   const [quizStep, setQuizStep] = useState(1);
   const [quizAnswers, setQuizAnswers] = useState({ occasion: '', relation: '', vibe: '' });
 
   const bestsellers = products.filter((p) => p.bestseller || p.featured).slice(0, 4);
+
+  const getCategoryIcon = (id: string) => {
+    switch (id) {
+      case 'plushies':
+        return <Heart className="w-5 h-5" />;
+      case 'chocolates':
+        return <Cookie className="w-5 h-5" />;
+      case 'jewellery':
+        return <Gem className="w-5 h-5" />;
+      case 'flowers':
+        return <Flower2 className="w-5 h-5" />;
+      case 'personalised':
+        return <Sparkles className="w-5 h-5" />;
+      case 'stationery':
+        return <ScrollText className="w-5 h-5" />;
+      case 'birthday':
+        return <Cake className="w-5 h-5" />;
+      case 'digital':
+        return <Mail className="w-5 h-5" />;
+      default:
+        return <Gift className="w-5 h-5" />;
+    }
+  };
 
   return (
     <div className="space-y-20 pb-12">
@@ -55,12 +88,12 @@ export const HomePage: React.FC<HomePageProps> = ({
             {/* Left Content */}
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold text-[#C45A7A] bg-[#FFF0F5] border border-[#F8BBD0]">
-                <Sparkles className="w-3.5 h-3.5 text-[#C45A7A]" />
+                <BowIcon className="w-3.5 h-3.5 text-[#C45A7A]" />
                 <span>The Coquette Gifting Atelier</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold text-[#59434D] leading-[1.15] text-balance">
-                A Little Box, A Lot of Love <span className="text-[#C45A7A]">💗</span>
+                A Little Box, A Lot of Love <Heart className="w-9 h-9 inline-block text-[#C45A7A] fill-current" />
               </h1>
 
               <p className="text-base sm:text-lg text-[#59434D]/80 max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans">
@@ -68,33 +101,58 @@ export const HomePage: React.FC<HomePageProps> = ({
               </p>
 
               {/* CTAs */}
-              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
                 <button
                   onClick={onOpenBuilder}
-                  className="w-full sm:w-auto py-3.5 px-7 rounded-2xl text-xs sm:text-sm font-semibold text-white bg-[#C45A7A] hover:bg-[#b04867] shadow-md hover:shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+                  className="py-3.5 px-6 rounded-2xl text-xs sm:text-sm font-semibold text-white bg-[#C45A7A] hover:bg-[#b04867] shadow-md hover:shadow-lg transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Gift className="w-4 h-4" />
                   Build Your Gift Box (3D)
                 </button>
 
+                {onOpenSurpriseMe && (
+                  <button
+                    onClick={onOpenSurpriseMe}
+                    className="py-3.5 px-5 rounded-2xl text-xs sm:text-sm font-semibold text-[#59434D] bg-gradient-to-r from-[#FFC0CB]/50 to-[#F8BBD0]/50 hover:bg-[#F8BBD0]/80 border border-[#F8BBD0] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                  >
+                    <BowIcon className="w-4 h-4 text-[#C45A7A]" />
+                    Surprise Me
+                  </button>
+                )}
+
+                {onOpenQuiz && (
+                  <button
+                    onClick={onOpenQuiz}
+                    className="py-3.5 px-5 rounded-2xl text-xs sm:text-sm font-semibold text-[#C45A7A] bg-white hover:bg-[#FFF0F5] border border-[#F8BBD0] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Gift Finder Quiz
+                  </button>
+                )}
+
                 <button
                   onClick={onOpenScheduler}
-                  className="w-full sm:w-auto py-3.5 px-6 rounded-2xl text-xs sm:text-sm font-semibold text-[#C45A7A] bg-white hover:bg-[#FFF0F5] border border-[#F8BBD0] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="py-3.5 px-5 rounded-2xl text-xs sm:text-sm font-semibold text-gray-600 bg-white hover:bg-[#FFF0F5] border border-gray-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Calendar className="w-4 h-4" />
-                  Schedule a Birthday
+                  Birthday Scheduler
                 </button>
               </div>
 
               {/* Quiet Social Proof */}
-              <div className="pt-4 flex items-center justify-center lg:justify-start gap-4 text-xs text-gray-500">
-                <div className="flex -space-x-2">
-                  {['🌸', '🎀', '✨', '💝'].map((emoji, i) => (
+              <div className="pt-4 flex items-center justify-center lg:justify-start gap-3 text-xs text-gray-500">
+                <div className="flex -space-x-1.5">
+                  {[
+                    <Heart key="1" className="w-3.5 h-3.5 text-[#C45A7A] fill-current" />,
+                    <BowIcon key="2" className="w-3.5 h-3.5 text-[#C45A7A]" />,
+                    <Sparkles key="3" className="w-3.5 h-3.5 text-[#C45A7A]" />,
+                    <Gift key="4" className="w-3.5 h-3.5 text-[#C45A7A]" />,
+                  ].map((icon, i) => (
                     <span
                       key={i}
-                      className="w-7 h-7 rounded-full bg-white border border-[#F8BBD0] flex items-center justify-center text-xs shadow-xs"
+                      className="w-7 h-7 rounded-full bg-white border border-[#F8BBD0] flex items-center justify-center shadow-xs"
                     >
-                      {emoji}
+                      {icon}
                     </span>
                   ))}
                 </div>
@@ -121,8 +179,9 @@ export const HomePage: React.FC<HomePageProps> = ({
             <span className="text-xs font-semibold tracking-wider text-[#C45A7A] uppercase">
               Curated Collections
             </span>
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#59434D] mt-1">
-              Explore Gift Categories 🎀
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#59434D] mt-1 flex items-center gap-2">
+              Explore Gift Categories
+              <BowIcon className="w-5 h-5 text-[#C45A7A]" />
             </h2>
           </div>
 
@@ -141,15 +200,8 @@ export const HomePage: React.FC<HomePageProps> = ({
               onClick={() => onOpenShopCategory(cat.id)}
               className="p-4 rounded-2xl bg-white border border-[#F8BBD0]/40 hover:border-[#C45A7A] hover:shadow-sm text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-2 group"
             >
-              <div className="w-12 h-12 rounded-2xl bg-[#FFF0F5] text-[#C45A7A] group-hover:scale-110 group-hover:bg-[#C45A7A] group-hover:text-white transition-all flex items-center justify-center text-xl shadow-xs">
-                {cat.id === 'plushies' && '🧸'}
-                {cat.id === 'chocolates' && '🍫'}
-                {cat.id === 'jewellery' && '💍'}
-                {cat.id === 'flowers' && '🌹'}
-                {cat.id === 'personalised' && '✨'}
-                {cat.id === 'stationery' && '📜'}
-                {cat.id === 'birthday' && '🎂'}
-                {cat.id === 'digital' && '💌'}
+              <div className="w-12 h-12 rounded-2xl bg-[#FFF0F5] text-[#C45A7A] group-hover:scale-110 group-hover:bg-[#C45A7A] group-hover:text-white transition-all flex items-center justify-center shadow-xs">
+                {getCategoryIcon(cat.id)}
               </div>
               <span className="text-xs font-semibold text-[#59434D] line-clamp-1 group-hover:text-[#C45A7A]">
                 {cat.name.split(' ')[0]}
@@ -166,8 +218,9 @@ export const HomePage: React.FC<HomePageProps> = ({
             <span className="text-xs font-semibold tracking-wider text-[#C45A7A] uppercase">
               Treasures of the Atelier
             </span>
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#59434D] mt-1">
-              Bestselling Pookie Favourites 💗
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#59434D] mt-1 flex items-center gap-2">
+              Bestselling Pookie Favourites
+              <Heart className="w-5 h-5 text-[#C45A7A] fill-current" />
             </h2>
           </div>
 
@@ -248,8 +301,9 @@ export const HomePage: React.FC<HomePageProps> = ({
             <span className="text-xs font-semibold tracking-wider text-[#C45A7A] uppercase">
               The Art of Gifting
             </span>
-            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#59434D] mt-1">
-              How PookieBox Works 🎀
+            <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#59434D] mt-1 flex items-center justify-center gap-2">
+              How PookieBox Works
+              <BowIcon className="w-6 h-6 text-[#C45A7A]" />
             </h2>
             <p className="text-xs text-gray-500 mt-2">
               From our digital 3D atelier to their doorstep in 4 simple steps.
@@ -262,32 +316,34 @@ export const HomePage: React.FC<HomePageProps> = ({
                 num: '01',
                 title: 'Select Box & Ribbons',
                 desc: 'Pick your keepsake chest color and choose from satin butterfly bows, French knots, and rosette ties.',
-                icon: '🎁',
+                icon: <Box className="w-6 h-6 text-[#C45A7A]" />,
               },
               {
                 num: '02',
                 title: 'Fill With Treasures',
                 desc: 'Add soft plushies, artisan French ruby chocolates, rose gold jewelry, and dried floral vials.',
-                icon: '🧸',
+                icon: <Gift className="w-6 h-6 text-[#C45A7A]" />,
               },
               {
                 num: '03',
                 title: 'Personalize with Love',
                 desc: 'Compose a heartfelt letterpress note sealed with golden wax and addressed to your recipient.',
-                icon: '💌',
+                icon: <ScrollText className="w-6 h-6 text-[#C45A7A]" />,
               },
               {
                 num: '04',
                 title: 'Delivered with Magic',
                 desc: 'Hand-packed with fairy lights and rose petals, delivered directly with live express tracking.',
-                icon: '✨',
+                icon: <Sparkles className="w-6 h-6 text-[#C45A7A]" />,
               },
             ].map((step) => (
               <div
                 key={step.num}
                 className="bg-white rounded-3xl p-6 border border-[#F8BBD0]/50 shadow-xs space-y-3 relative overflow-hidden"
               >
-                <div className="text-2xl">{step.icon}</div>
+                <div className="w-10 h-10 rounded-2xl bg-[#FFF0F5] flex items-center justify-center">
+                  {step.icon}
+                </div>
                 <span className="text-xs font-mono font-bold text-[#C45A7A]">{step.num}.</span>
                 <h3 className="text-sm font-semibold text-[#59434D]">{step.title}</h3>
                 <p className="text-xs text-gray-500 leading-relaxed">{step.desc}</p>
@@ -312,8 +368,9 @@ export const HomePage: React.FC<HomePageProps> = ({
           <span className="text-xs font-semibold tracking-wider text-[#C45A7A] uppercase">
             Love Notes From Recipients
           </span>
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#59434D] mt-1">
-            Cherished Unboxings 💌
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#59434D] mt-1 flex items-center justify-center gap-2">
+            Cherished Unboxings
+            <Mail className="w-5 h-5 text-[#C45A7A]" />
           </h2>
         </div>
 
@@ -377,8 +434,9 @@ export const HomePage: React.FC<HomePageProps> = ({
             <span className="text-xs font-semibold text-[#C45A7A] uppercase tracking-wider">
               Need inspiration?
             </span>
-            <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#59434D]">
-              Take the 30-Second Gift Finder Quiz 🎀
+            <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#59434D] flex items-center justify-center md:justify-start gap-2">
+              Take the 30-Second Gift Finder Quiz
+              <BowIcon className="w-6 h-6 text-[#C45A7A]" />
             </h3>
             <p className="text-xs text-gray-600 max-w-md">
               Answer 3 quick questions about their personality and budget, and we’ll curate their dream box in our 3D builder!
@@ -405,7 +463,9 @@ export const HomePage: React.FC<HomePageProps> = ({
             <div className="flex items-center justify-between border-b pb-3">
               <div>
                 <span className="text-[10px] text-gray-400 uppercase">Question {quizStep} of 3</span>
-                <h3 className="text-base font-bold text-[#59434D]">Pookie Gift Stylist 🎀</h3>
+                <h3 className="text-base font-bold text-[#59434D] flex items-center gap-1.5">
+                  Pookie Gift Stylist <BowIcon className="w-4 h-4 text-[#C45A7A]" />
+                </h3>
               </div>
               <button
                 onClick={() => setShowQuizModal(false)}

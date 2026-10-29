@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { ThreeGiftBox } from './ThreeGiftBox.tsx';
-import { Product, CustomGiftBox, CustomGiftBoxItem, RibbonStyle } from '../types.ts';
+import { Product, CustomGiftBox, CustomGiftBoxItem, RibbonStyle, GreetingCardDesign } from '../types.ts';
 import { BOX_STYLES, RIBBON_COLORS, RIBBON_STYLES, WRAPPING_STYLES } from '../data/catalog.ts';
-import { Check, Plus, Minus, Heart, Sparkles, ShoppingBag, Eye, Bookmark, ArrowRight } from 'lucide-react';
+import { Check, Plus, Minus, Heart, Sparkles, ShoppingBag, Bookmark, ArrowRight, Box, Share2 } from 'lucide-react';
+import { BowIcon } from './BowIcon.tsx';
+import { GreetingCardDesigner } from './GreetingCardDesigner.tsx';
 import confetti from 'canvas-confetti';
 
 interface BoxBuilderProps {
@@ -31,12 +33,16 @@ export const BoxBuilder: React.FC<BoxBuilderProps> = ({
   const [boxItems, setBoxItems] = useState<CustomGiftBoxItem[]>(initialBox?.items || []);
   const [recipientName, setRecipientName] = useState(initialBox?.recipientName || '');
   const [personalizedMessage, setPersonalizedMessage] = useState(
-    initialBox?.personalizedMessage || 'You are so cherished and loved! Happy Birthday my favorite pookie 💖'
+    initialBox?.personalizedMessage || 'You are so cherished and loved! Wishing you endless bliss.'
   );
 
   const [isLidOpen, setIsLidOpen] = useState(true);
   const [activeStep, setActiveStep] = useState<1 | 2 | 3 | 4>(1);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [isCardDesignerOpen, setIsCardDesignerOpen] = useState(false);
+  const [customCard, setCustomCard] = useState<GreetingCardDesign | null>(initialBox?.greetingCard || null);
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false);
+  const [shareLinkCopied, setShareLinkCopied] = useState(false);
 
   // Pricing calculations
   const selectedRibbon = RIBBON_STYLES.find((r) => r.style === ribbonStyle);
@@ -83,12 +89,49 @@ export const BoxBuilder: React.FC<BoxBuilderProps> = ({
     items: boxItems,
     recipientName,
     personalizedMessage,
+    greetingCard: customCard || undefined,
     boxPrice: boxBasePrice,
     itemsPrice,
     wrappingPrice,
     totalPrice,
     createdAt: new Date().toISOString(),
   });
+
+  const handleGenerateShareLink = async () => {
+    setIsGeneratingLink(true);
+    try {
+      const box = getCustomBoxObject();
+      const res = await fetch('/api/gift-links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senderName: 'Your Special Secret Admirer',
+          recipientName: recipientName || 'My Precious Pookie',
+          message: personalizedMessage,
+          greetingCard: customCard,
+          boxSnapshot: {
+            boxName: box.name,
+            boxColor: box.boxColor,
+            ribbonColor: box.ribbonColor,
+            ribbonStyle: box.ribbonStyle,
+            items: box.items.map((i) => ({ name: i.product.name, price: i.product.price, quantity: i.quantity })),
+          },
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const shareUrl = `${window.location.origin}?giftToken=${data.giftLink.token}`;
+        navigator.clipboard.writeText(shareUrl);
+        setShareLinkCopied(true);
+        setTimeout(() => setShareLinkCopied(false), 3000);
+      }
+    } catch (e) {
+      console.error('Error generating share link:', e);
+    } finally {
+      setIsGeneratingLink(false);
+    }
+  };
 
   const handleAddBoxToCart = () => {
     const box = getCustomBoxObject();
@@ -112,11 +155,13 @@ export const BoxBuilder: React.FC<BoxBuilderProps> = ({
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-8">
-        <span className="text-xs font-semibold tracking-wider text-[#C45A7A] uppercase">
+        <span className="text-xs font-semibold tracking-wider text-[#C45A7A] uppercase flex items-center justify-center gap-1.5">
+          <BowIcon className="w-3.5 h-3.5 text-[#C45A7A]" />
           Coquette Atelier & Studio
         </span>
-        <h1 className="text-3xl sm:text-4xl font-serif text-[#59434D] mt-1.5 font-bold">
-          Build Your Custom 3D PookieBox 🎀
+        <h1 className="text-3xl sm:text-4xl font-serif text-[#59434D] mt-1.5 font-bold flex items-center justify-center gap-2">
+          Build Your Custom 3D PookieBox
+          <BowIcon className="w-7 h-7 text-[#C45A7A]" />
         </h1>
         <p className="text-sm text-[#59434D]/80 mt-2">
           Design your keepsake box in real-time 3D, pick adorable treasures, and add your handwritten love note.
@@ -270,10 +315,10 @@ export const BoxBuilder: React.FC<BoxBuilderProps> = ({
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className="w-10 h-10 rounded-xl border border-black/10 shadow-inner flex items-center justify-center text-lg"
+                          className="w-10 h-10 rounded-xl border border-black/10 shadow-inner flex items-center justify-center text-[#C45A7A]"
                           style={{ backgroundColor: box.boxColor }}
                         >
-                          🎀
+                          <BowIcon className="w-5 h-5 text-[#C45A7A]" />
                         </div>
                         <div>
                           <h4 className="text-sm font-semibold text-[#59434D]">{box.name}</h4>
@@ -572,26 +617,63 @@ export const BoxBuilder: React.FC<BoxBuilderProps> = ({
                   </div>
                 </div>
 
+                {/* Custom Greeting Card Designer Attachment */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-[#FFC0CB]/20 via-[#FFF0F5] to-[#E6D6FF]/20 border border-[#F8BBD0] flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-white border border-[#F8BBD0] flex items-center justify-center text-[#C45A7A] shadow-xs">
+                      <BowIcon className="w-5 h-5 text-[#C45A7A]" />
+                    </div>
+                    <div>
+                      <h5 className="font-serif font-bold text-xs text-[#59434D]">
+                        {customCard ? `Attached: ${customCard.title}` : 'Design a Custom Greeting Card'}
+                      </h5>
+                      <p className="text-[11px] text-[#59434D]/70">
+                        {customCard ? 'Card customized with font, background & coquette stickers' : 'Choose pastel textures, typography, and stickers'}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsCardDesignerOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-white border border-[#C45A7A] text-[#C45A7A] hover:bg-[#FFF0F5] text-xs font-bold shrink-0 cursor-pointer shadow-xs"
+                  >
+                    {customCard ? 'Edit Card' : 'Design Card'}
+                  </button>
+                </div>
+
                 {/* Wax Seal Card Preview */}
                 <div className="p-4 rounded-2xl bg-[#FFF9F5] border border-[#F8BBD0] text-center font-serif">
                   <div className="text-[11px] text-[#C45A7A] tracking-widest uppercase">PookieBox Letterpress Card</div>
                   <div className="text-sm font-semibold text-[#59434D] mt-2 italic">
                     "{personalizedMessage || 'Your sweet message will appear here...'}"
                   </div>
-                  <div className="text-xs text-[#C45A7A] mt-2 font-sans font-medium">
-                    With endless love 💗
+                  <div className="text-xs text-[#C45A7A] mt-2 font-sans font-medium flex items-center justify-center gap-1">
+                    <span>With endless love</span>
+                    <Heart className="w-3.5 h-3.5 fill-current" />
                   </div>
                 </div>
               </div>
 
-              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+              {/* Shareable Link Generator */}
+              <div className="pt-2 flex flex-col gap-2">
                 <button
-                  onClick={handleAddBoxToCart}
-                  className="flex-1 py-3 px-4 rounded-xl font-semibold text-sm text-white bg-[#C45A7A] hover:bg-[#b04867] shadow-sm flex items-center justify-center gap-2 transition-all active:scale-98 cursor-pointer"
+                  type="button"
+                  onClick={handleGenerateShareLink}
+                  disabled={isGeneratingLink}
+                  className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-[#59434D] bg-[#FFF0F5] hover:bg-[#F8BBD0]/30 border border-[#F8BBD0] flex items-center justify-center gap-2 cursor-pointer transition-colors"
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  Add Custom Box to Cart (₹{totalPrice.toLocaleString('en-IN')})
+                  <Share2 className="w-3.5 h-3.5 text-[#C45A7A]" />
+                  <span>{shareLinkCopied ? 'Preview Link Copied to Clipboard!' : 'Generate Shareable 3D Preview Link'}</span>
                 </button>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={handleAddBoxToCart}
+                    className="flex-1 py-3 px-4 rounded-xl font-semibold text-sm text-white bg-[#C45A7A] hover:bg-[#b04867] shadow-sm flex items-center justify-center gap-2 transition-all active:scale-98 cursor-pointer"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Add Custom Box to Cart (₹{totalPrice.toLocaleString('en-IN')})
+                  </button>
+                </div>
               </div>
             </div>
           )}
@@ -605,6 +687,17 @@ export const BoxBuilder: React.FC<BoxBuilderProps> = ({
           <span>Gift box configuration saved to your account!</span>
         </div>
       )}
+
+      {/* Greeting Card Designer Modal */}
+      <GreetingCardDesigner
+        isOpen={isCardDesignerOpen}
+        onClose={() => setIsCardDesignerOpen(false)}
+        initialCard={customCard || undefined}
+        onSaveCard={(card) => {
+          setCustomCard(card);
+          setIsCardDesignerOpen(false);
+        }}
+      />
     </div>
   );
 };

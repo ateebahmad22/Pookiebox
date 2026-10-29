@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BirthdayEntry, Product } from '../types.ts';
 import { Calendar, Cake, Bell, Sparkles, Plus, Trash2, Edit2, Gift, Send, Clock, Heart, CheckCircle2 } from 'lucide-react';
+import { BowIcon } from './BowIcon.tsx';
 
 interface BirthdaySchedulerProps {
   products: Product[];
@@ -169,11 +170,13 @@ export const BirthdayScheduler: React.FC<BirthdaySchedulerProps> = ({
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto">
-        <span className="text-xs font-semibold tracking-wider text-[#C45A7A] uppercase">
-          Never Miss a Cherished Moment
+        <span className="text-xs font-semibold tracking-wider text-[#C45A7A] uppercase flex items-center justify-center gap-1.5">
+          <Cake className="w-3.5 h-3.5" />
+          <span>Never Miss a Cherished Moment</span>
         </span>
-        <h1 className="text-3xl sm:text-4xl font-serif text-[#59434D] mt-1 font-bold">
-          Birthday & Surprise Scheduler 🎂🎀
+        <h1 className="text-3xl sm:text-4xl font-serif text-[#59434D] mt-1 font-bold flex items-center justify-center gap-2">
+          <span>Birthday & Surprise Scheduler</span>
+          <BowIcon className="w-6 h-6 text-[#C45A7A]" />
         </h1>
         <p className="text-sm text-[#59434D]/80 mt-2">
           Save birthdays for your loved ones, receive gentle email reminders, and generate tailored PookieBox gift combinations.
@@ -191,8 +194,8 @@ export const BirthdayScheduler: React.FC<BirthdaySchedulerProps> = ({
       {nextBirthday && (
         <div className="bg-gradient-to-r from-[#FFC0CB]/30 via-[#F8BBD0]/40 to-[#E6D6FF]/40 rounded-3xl p-6 sm:p-8 border border-[#F8BBD0]/50 shadow-xs flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-3xl shrink-0">
-              🎂
+            <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center shrink-0 border border-[#F8BBD0]">
+              <Cake className="w-8 h-8 text-[#C45A7A]" />
             </div>
             <div>
               <span className="text-xs font-semibold text-[#C45A7A] uppercase tracking-wider">

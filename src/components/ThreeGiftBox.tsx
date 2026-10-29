@@ -406,14 +406,14 @@ export const ThreeGiftBox: React.FC<ThreeGiftBoxProps> = ({
           onClick={onToggleOpen}
           className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium text-[#C45A7A] bg-white/90 backdrop-blur-md shadow-sm border border-[#F8BBD0]/60 hover:bg-[#F8BBD0]/20 transition-all active:scale-95 cursor-pointer"
         >
-          <span>{isOpen ? '🎀 Close Box Lid' : '✨ Open Box Lid'}</span>
+          <span>{isOpen ? 'Close Box Lid' : 'Open Box Lid'}</span>
           <span className="text-[10px] text-gray-400">({isOpen ? 'Inspect Inside' : 'Tap to Peek'})</span>
         </button>
       </div>
 
       {recipientName && (
         <div className="absolute top-4 right-4 z-10 hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-serif italic text-[#C45A7A] bg-white/80 border border-[#F8BBD0]/50 shadow-xs">
-          <span>For: {recipientName} 💝</span>
+          <span>For: {recipientName}</span>
         </div>
       )}
 

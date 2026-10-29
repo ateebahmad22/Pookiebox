@@ -129,7 +129,7 @@ export const Hero3DBox: React.FC<{ onBuildClick?: () => void }> = ({ onBuildClic
       <div ref={mountRef} className="w-full h-full" />
       <div className="absolute bottom-2 text-center pointer-events-none">
         <span className="text-xs font-serif italic text-[#C45A7A] bg-white/80 px-3 py-1 rounded-full shadow-xs border border-[#F8BBD0]">
-          ✨ Click to Customize in 3D ✨
+          Click to Customize in 3D
         </span>
       </div>
     </div>

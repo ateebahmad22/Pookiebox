@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Heart, Sparkles, Send, ShieldCheck, Truck, RefreshCw, Mail } from 'lucide-react';
+import { Heart, Sparkles, ShieldCheck, Truck, RefreshCw, Mail, MapPin, Clock } from 'lucide-react';
+import { BowIcon } from './BowIcon.tsx';
 
 export const Footer: React.FC = () => {
   const [emailInput, setEmailInput] = useState('');
@@ -61,18 +62,24 @@ export const Footer: React.FC = () => {
         {/* Main Footer Links */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
           <div className="md:col-span-5 space-y-4">
-            <span className="text-2xl font-serif font-bold text-[#C45A7A]">PookieBox 🎀</span>
+            <span className="text-2xl font-serif font-bold text-[#C45A7A] flex items-center gap-1.5">
+              PookieBox <BowIcon className="w-6 h-6 text-[#C45A7A]" />
+            </span>
             <p className="text-xs text-[#59434D]/80 leading-relaxed max-w-sm">
               "A Little Box, A Lot of Love." We craft enchanting, aesthetic gift boxes wrapped with silky satin ribbons, dried florals, and pure joy for birthdays, anniversaries, and sweet surprises.
             </p>
 
             {/* Newsletter */}
             <div className="pt-2">
-              <h5 className="text-xs font-semibold text-[#59434D] mb-1.5">Join the Pookie Club 💌</h5>
+              <h5 className="text-xs font-semibold text-[#59434D] mb-1.5 flex items-center gap-1">
+                <span>Join the Pookie Club</span>
+                <Mail className="w-3.5 h-3.5 text-[#C45A7A]" />
+              </h5>
               <p className="text-[11px] text-gray-500 mb-2">Get secret gift drops and ₹100 flat discount on your custom box.</p>
               {newsletterSubscribed ? (
-                <div className="p-3 rounded-xl bg-pink-50 border border-[#F8BBD0] text-xs text-[#C45A7A] font-semibold">
-                  Yay! You’re on the list! Use code <strong className="underline">LOVE100</strong> for ₹100 off! 💖
+                <div className="p-3 rounded-xl bg-pink-50 border border-[#F8BBD0] text-xs text-[#C45A7A] font-semibold flex items-center gap-1.5">
+                  <Heart className="w-4 h-4 fill-current" />
+                  <span>You are on the list! Use code <strong className="underline">LOVE100</strong> for ₹100 off.</span>
                 </div>
               ) : (
                 <form onSubmit={handleSubscribe} className="flex gap-2 max-w-sm">
@@ -120,19 +127,21 @@ export const Footer: React.FC = () => {
             <p className="text-xs text-gray-600 leading-relaxed">
               Have a special custom order or bulk corporate gifting request? Our gifting stylists are here for you.
             </p>
-            <div className="text-xs text-[#59434D] space-y-1">
-              <p>💌 hello@pookiebox.love</p>
-              <p>📍 Bandra West, Mumbai 400050</p>
-              <p>⏰ Mon - Sat: 10:00 AM - 8:00 PM</p>
+            <div className="text-xs text-[#59434D] space-y-1.5">
+              <p className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 text-[#C45A7A]" /> hello@pookiebox.love</p>
+              <p className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-[#C45A7A]" /> Bandra West, Mumbai 400050</p>
+              <p className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-[#C45A7A]" /> Mon - Sat: 10:00 AM - 8:00 PM</p>
             </div>
           </div>
         </div>
 
         {/* Bottom Copyright */}
         <div className="pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 gap-4">
-          <p>© {new Date().getFullYear()} PookieBox India. Handcrafted with love & satin bows.</p>
-          <div className="flex items-center gap-4">
-            <span>Made with 💗 for sweetest surprises</span>
+          <p>© {new Date().getFullYear()} PookieBox India. Handcrafted with love and satin bows.</p>
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <span>Made with</span>
+            <Heart className="w-3.5 h-3.5 text-[#C45A7A] fill-current" />
+            <span>for sweetest surprises</span>
           </div>
         </div>
       </div>
@@ -142,12 +151,13 @@ export const Footer: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full space-y-4 shadow-2xl border border-[#F8BBD0] max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="text-base font-bold text-[#59434D] uppercase tracking-wide">
-                {activeModal === 'faq' && 'Frequently Asked Questions 🎀'}
-                {activeModal === 'shipping' && 'Shipping & Delivery Policy 🚚'}
-                {activeModal === 'refund' && 'Returns & Refund Policy 🌸'}
-                {activeModal === 'privacy' && 'Privacy Policy 🛡️'}
-                {activeModal === 'terms' && 'Terms of Service 📜'}
+              <h3 className="text-base font-bold text-[#59434D] uppercase tracking-wide flex items-center gap-1.5">
+                {activeModal === 'faq' && 'Frequently Asked Questions'}
+                {activeModal === 'shipping' && 'Shipping & Delivery Policy'}
+                {activeModal === 'refund' && 'Returns & Refund Policy'}
+                {activeModal === 'privacy' && 'Privacy Policy'}
+                {activeModal === 'terms' && 'Terms of Service'}
+                <BowIcon className="w-4 h-4 text-[#C45A7A]" />
               </h3>
               <button onClick={() => setActiveModal(null)} className="text-gray-400 hover:text-gray-600 font-bold cursor-pointer">
                 ✕

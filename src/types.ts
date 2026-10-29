@@ -50,6 +50,19 @@ export interface CustomGiftBoxItem {
   quantity: number;
 }
 
+export interface GreetingCardDesign {
+  id: string;
+  occasion: 'birthday' | 'anniversary' | 'love' | 'friendship' | 'congrats';
+  title: string;
+  backgroundStyle: 'pink-ribbon' | 'lavender-clouds' | 'vintage-cream' | 'sparkle-stars' | 'rose-petals';
+  fontFamily: 'serif' | 'script' | 'modern';
+  primaryMessage: string;
+  signOff: string;
+  stickers: string[];
+  photoUrl?: string;
+  createdAt: string;
+}
+
 export interface CustomGiftBox {
   id: string;
   name: string;
@@ -61,11 +74,83 @@ export interface CustomGiftBox {
   items: CustomGiftBoxItem[];
   recipientName: string;
   personalizedMessage: string;
+  greetingCard?: GreetingCardDesign;
   boxPrice: number;
   itemsPrice: number;
   wrappingPrice: number;
   totalPrice: number;
   createdAt: string;
+}
+
+export interface GiftLink {
+  id: string;
+  token: string;
+  orderId?: string;
+  senderName: string;
+  senderEmail?: string;
+  recipientName: string;
+  message: string;
+  greetingCard?: GreetingCardDesign;
+  photos?: string[];
+  boxSnapshot?: any;
+  digitalGiftType?: string;
+  digitalGiftCode?: string;
+  isRevoked: boolean;
+  openedAt?: string;
+  createdAt: string;
+}
+
+export interface CoupleMilestone {
+  id: string;
+  title: string;
+  date: string;
+  note: string;
+  category: 'anniversary' | 'first_date' | 'trip' | 'proposal' | 'special';
+}
+
+export interface CoupleWishlistItem {
+  id: string;
+  title: string;
+  budget?: number;
+  notes?: string;
+  productId?: string;
+  addedBy: string;
+  createdAt: string;
+}
+
+export interface CoupleLoveNote {
+  id: string;
+  message: string;
+  date: string;
+  from: string;
+}
+
+export interface CoupleSpace {
+  userId: string;
+  partnerName: string;
+  anniversaryDate: string; // YYYY-MM-DD
+  relationshipType: string;
+  milestones: CoupleMilestone[];
+  wishlist: CoupleWishlistItem[];
+  loveNotes: CoupleLoveNote[];
+  updatedAt: string;
+}
+
+export interface ReferralHistoryItem {
+  id: string;
+  referredName: string;
+  date: string;
+  reward: number;
+  status: 'credited' | 'pending';
+}
+
+export interface ReferralProfile {
+  userId: string;
+  code: string;
+  creditsEarned: number;
+  creditsAvailable: number;
+  totalInvited: number;
+  history: ReferralHistoryItem[];
 }
 
 export interface CartItem {
@@ -124,8 +209,10 @@ export interface OrderItemSnapshot {
     ribbonStyle: string;
     recipientName: string;
     personalizedMessage: string;
+    greetingCard?: GreetingCardDesign;
     items: { name: string; quantity: number; price: number }[];
   };
+  digitalGiftCode?: string;
 }
 
 export interface Order {
@@ -136,6 +223,8 @@ export interface Order {
   delivery: DeliveryDetails;
   giftInfo: GiftInformation;
   items: OrderItemSnapshot[];
+  giftLinkToken?: string;
+  greetingCard?: GreetingCardDesign;
   subtotal: number;
   shipping: number;
   discount: number;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Product, Order, EmailLog, BirthdayEntry, OrderStatus } from '../types.ts';
+import { Product, Order, EmailLog, BirthdayEntry, OrderStatus, GiftLink, ReferralProfile } from '../types.ts';
+import { BowIcon } from './BowIcon.tsx';
 import {
   DollarSign,
   Package,
@@ -15,15 +16,20 @@ import {
   RefreshCw,
   Bell,
   ShieldAlert,
+  Share2,
+  EyeOff,
+  Users,
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'products' | 'emails' | 'birthdays'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'products' | 'emails' | 'birthdays' | 'gift_links' | 'referrals'>('overview');
   const [stats, setStats] = useState<any>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [emailLogs, setEmailLogs] = useState<EmailLog[]>([]);
   const [birthdays, setBirthdays] = useState<BirthdayEntry[]>([]);
+  const [giftLinks, setGiftLinks] = useState<GiftLink[]>([]);
+  const [referrals, setReferrals] = useState<ReferralProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Status Update Modal
@@ -52,12 +58,14 @@ export const AdminDashboard: React.FC = () => {
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      const [ovRes, ordRes, prodRes, emlRes, bdayRes] = await Promise.all([
+      const [ovRes, ordRes, prodRes, emlRes, bdayRes, glRes, refRes] = await Promise.all([
         fetch('/api/admin/overview'),
         fetch('/api/orders'),
         fetch('/api/products'),
         fetch('/api/admin/email-logs'),
         fetch('/api/birthdays'),
+        fetch('/api/admin/gift-links'),
+        fetch('/api/admin/referrals'),
       ]);
 
       if (ovRes.ok) setStats(await ovRes.json());
@@ -65,6 +73,8 @@ export const AdminDashboard: React.FC = () => {
       if (prodRes.ok) setProducts((await prodRes.json()).products || []);
       if (emlRes.ok) setEmailLogs((await emlRes.json()).emails || []);
       if (bdayRes.ok) setBirthdays((await bdayRes.json()).birthdays || []);
+      if (glRes.ok) setGiftLinks((await glRes.json()).giftLinks || []);
+      if (refRes.ok) setReferrals((await refRes.json()).referrals || []);
     } catch (err) {
       console.error('Error fetching admin data:', err);
     } finally {
@@ -141,13 +151,16 @@ export const AdminDashboard: React.FC = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#F8BBD0]/40 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-serif font-bold text-[#59434D]">PookieBox Atelier Dashboard 🎀</h1>
+            <h1 className="text-2xl font-serif font-bold text-[#59434D] flex items-center gap-2">
+              <span>PookieBox Atelier Dashboard</span>
+              <BowIcon className="w-5 h-5 text-[#C45A7A]" />
+            </h1>
             <span className="text-xs font-bold text-[#C45A7A] bg-[#FFF0F5] px-2.5 py-0.5 rounded-full border border-[#F8BBD0]">
               Admin Role Active
             </span>
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Real-time orders, payment tracking, live dispatch controls, and transactional email logs.
+            Real-time orders, payment tracking, live dispatch controls, digital unboxing links, and referrals.
           </p>
         </div>
 
@@ -166,6 +179,8 @@ export const AdminDashboard: React.FC = () => {
           { id: 'overview', label: 'Overview & KPIs' },
           { id: 'orders', label: `Orders (${orders.length})` },
           { id: 'products', label: `Products (${products.length})` },
+          { id: 'gift_links', label: `Gift Links (${giftLinks.length})` },
+          { id: 'referrals', label: `Referral Program (${referrals.length})` },
           { id: 'emails', label: `Email Logs (${emailLogs.length})` },
           { id: 'birthdays', label: `Birthday Reminders (${birthdays.length})` },
         ].map((tab) => (
@@ -448,6 +463,112 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* TAB: Digital Gift Links */}
+      {activeTab === 'gift_links' && (
+        <div className="bg-white rounded-3xl p-6 border border-[#F8BBD0]/40 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-[#F8BBD0]/30 pb-4">
+            <div>
+              <h3 className="text-base font-semibold text-[#59434D]">Digital Unboxing & Gift Links ({giftLinks.length})</h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Manage 3D gift unboxing tokens, access permissions, and revoke compromised links.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {giftLinks.length === 0 ? (
+              <div className="text-center py-8 text-xs text-gray-400">No gift links generated yet.</div>
+            ) : (
+              giftLinks.map((link) => (
+                <div key={link.id} className="p-4 rounded-2xl border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-[#C45A7A]">{link.token}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        link.isRevoked ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'
+                      }`}>
+                        {link.isRevoked ? 'Revoked' : 'Active'}
+                      </span>
+                      {link.openedAt && (
+                        <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-[10px] font-medium">
+                          Opened
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[#59434D] mt-1">
+                      From: <strong>{link.senderName}</strong> → To: <strong>{link.recipientName}</strong>
+                    </p>
+                    <p className="text-[11px] text-gray-400 mt-0.5 italic">"{link.message}"</p>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-center">
+                    {!link.isRevoked && (
+                      <button
+                        onClick={async () => {
+                          await fetch(`/api/gift-links/${link.id}/revoke`, { method: 'POST' });
+                          fetchData();
+                        }}
+                        className="px-3 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold cursor-pointer"
+                      >
+                        Revoke Access
+                      </button>
+                    )}
+                    <a
+                      href={`?giftToken=${link.token}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-[#FFF0F5] text-[#C45A7A] border border-[#F8BBD0] text-xs font-semibold hover:bg-[#F8BBD0]/30 cursor-pointer"
+                    >
+                      Preview Reveal
+                    </a>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* TAB: Referral Program */}
+      {activeTab === 'referrals' && (
+        <div className="bg-white rounded-3xl p-6 border border-[#F8BBD0]/40 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-[#F8BBD0]/30 pb-4">
+            <div>
+              <h3 className="text-base font-semibold text-[#59434D]">Referral Rewards Program ({referrals.length})</h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Active customer referral codes, reward ledgers, and credit redemption rates.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {referrals.length === 0 ? (
+              <div className="text-center py-8 text-xs text-gray-400">No active referral profiles yet.</div>
+            ) : (
+              referrals.map((ref) => (
+                <div key={ref.userId} className="p-4 rounded-2xl border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-[#59434D] text-sm">{ref.code}</span>
+                      <span className="text-gray-400">User: {ref.userId}</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-600">
+                      <span>Total Invited: <strong>{ref.totalInvited}</strong></span>
+                      <span>Credits Earned: <strong className="text-emerald-600">₹{ref.creditsEarned}</strong></span>
+                      <span>Credits Available: <strong className="text-[#C45A7A]">₹{ref.creditsAvailable}</strong></span>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="text-[11px] text-gray-400 block">{ref.history?.length || 0} Successful Conversions</span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}
